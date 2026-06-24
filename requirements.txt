@@ -1,0 +1,8 @@
+pandas
+openpyxl
+customtkinter
+jinja2
+plotly
+xlsxwriter
+pillow
+streamlit
