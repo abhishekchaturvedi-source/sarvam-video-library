@@ -27,7 +27,7 @@ st.set_page_config(
 @st.cache_data(ttl=60)
 def load_data():
     return pd.read_excel(
-        "VideoList.xlsx",
+        "VideoLists.xlsx",
         dtype=str
     ).fillna("")
 
