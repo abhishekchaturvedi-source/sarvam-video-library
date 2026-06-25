@@ -47,6 +47,8 @@ def load_data():
     )
 
     return df
+    # VERY IMPORTANT
+df = load_data()
 # ======================
 # GLOBAL SEARCH
 # ======================
