@@ -41,19 +41,36 @@ df = load_data()
 # HEADER
 # ======================
 
-col_logo, col_title = st.columns([1, 6])
+# ======================
+# HEADER
+# ======================
 
-with col_logo:
-    st.image("assets/logo.png", width=430)
+col1, col2, col3 = st.columns([1, 8, 1])
 
-with col_title:
+with col1:
+    st.image("assets/logo.png", width=110)
+
+with col2:
     st.markdown(
         """
-        <h1 style='color:#1E66F5; margin-top:20px;'>
-        Sarvam Video Library
+        <h1 style="
+            text-align:center;
+            color:#0B5ED7;
+            margin-top:20px;
+            margin-bottom:0px;
+            font-weight:bold;">
+            🎥 Sarvam Video Library
         </h1>
+
+        <p style="
+            text-align:center;
+            color:gray;
+            font-size:18px;
+            margin-top:0px;">
+            Faculty Lecture Verification Portal
+        </p>
         """,
-        unsafe_allow_html=True,
+        unsafe_allow_html=True
     )
 # GLOBAL SEARCH
 # ======================
