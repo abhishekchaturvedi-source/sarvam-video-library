@@ -24,25 +24,29 @@ st.set_page_config(
 # --------------------------
 # Load Data
 # --------------------------
+import os
+
 @st.cache_data(ttl=60)
 def load_data():
+
+    st.write("Current Folder:", os.getcwd())
+
+    st.write("Files in Repository:")
+    st.write(os.listdir("."))
+
     df = pd.read_excel("VideoLists.xlsx", dtype=str).fillna("")
+
+    st.write("Loaded File : VideoLists.xlsx")
+
+    st.write("Faculty values containing PL:")
+
+    st.dataframe(
+        df[df["Faculty"].str.contains("PL", case=False, na=False)]
+        [["Faculty"]]
+        .drop_duplicates()
+    )
+
     return df
-
-df = load_data()
-
-st.success("Reading file: VideoLists.xlsx")
-
-st.write("Total Rows:", len(df))
-
-st.write("Unique Faculty Names")
-
-st.write(sorted(df["Faculty"].unique()))
-
-st.write("First 10 Rows")
-
-st.dataframe(df[["Batch","Subject","Faculty","Chapter","Video Name"]].head(10))
-
 # ======================
 # GLOBAL SEARCH
 # ======================
