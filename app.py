@@ -24,27 +24,18 @@ st.set_page_config(
 # --------------------------
 # Load Data
 # --------------------------
+# --------------------------
+# Load Data
+# --------------------------
 @st.cache_data(ttl=60)
 def load_data():
-    df = pd.read_excel("VideoLists.xlsx", dtype=str).fillna("")
+    df = pd.read_excel(
+        "VideoLists.xlsx",
+        dtype=str
+    ).fillna("")
     return df
 
-df = load_data()
-
-st.success("Reading file: VideoLists.xlsx")
-
-st.write("Total Rows:", len(df))
-
-st.write("Unique Faculty Names")
-
-st.write(sorted(df["Faculty"].unique()))
-
-st.write("First 10 Rows")
-
-st.dataframe(df[["Batch","Subject","Faculty","Chapter","Video Name"]].head(10))
-    # VERY IMPORTANT
-df = load_data()
-# ======================
+df = load_data()# ======================
 # GLOBAL SEARCH
 # ======================
 # ======================
