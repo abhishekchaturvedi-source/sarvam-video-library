@@ -1,7 +1,19 @@
-import streamlit as st
-import pandas as pd
 import re
 import html
+
+def get_embed_url(embed_html):
+    if pd.isna(embed_html):
+        return ""
+
+    match = re.search(r'src="([^"]+)"', str(embed_html))
+
+    if match:
+        return html.unescape(match.group(1))
+
+    return ""
+import streamlit.components.v1 as components
+import streamlit as st
+import pandas as pd
 
 st.set_page_config(
     page_title="Sarvam Video Library",
@@ -9,148 +21,212 @@ st.set_page_config(
     layout="wide"
 )
 
-
-# ----------------------
-# Extract Vimeo Embed URL
-# ----------------------
-def get_embed_url(embed_html):
-    if pd.isna(embed_html):
-        return ""
-
-    text = str(embed_html)
-
-    match = re.search(r'src="([^"]+)"', text)
-
-    if match:
-        return html.unescape(match.group(1))
-
-    return ""
-
-
-# ----------------------
-# Load Excel
-# ----------------------
+# --------------------------
+# Load Data
+# --------------------------
 @st.cache_data
 def load_data():
-    return pd.read_excel("VideoList.xlsx", dtype=str).fillna("")
+    data = pd.read_excel(
+        "VideoList.xlsx",
+        dtype=str
+    )
 
+    data = data.fillna("")
+
+    return data
 
 df = load_data()
 
 st.title("🎥 Sarvam Video Library")
 
+# ======================
+# GLOBAL SEARCH
+# ======================
+# ======================
+# TOP SEARCH
+# ======================
 
-# ----------------------
-# Global Search
-# ----------------------
-search = st.sidebar.text_input(
-    "🔍 Search Lecture / Chapter / Faculty"
+st.markdown("### 🔍 Search")
+
+search_text = st.text_input(
+    "",
+    placeholder="Search Lecture / Chapter / Faculty..."
 )
 
-if search:
+if search_text:
 
     result = df[
-        df["Video Name"].str.contains(search, case=False, na=False)
+        df["Video Name"].str.contains(search_text, case=False, na=False)
         |
-        df["Chapter"].str.contains(search, case=False, na=False)
+        df["Chapter"].str.contains(search_text, case=False, na=False)
         |
-        df["Faculty"].str.contains(search, case=False, na=False)
+        df["Faculty"].str.contains(search_text, case=False, na=False)
     ]
 
-else:
-    result = df
+    st.subheader(f"Search Results ({len(result)})")
+
+    for _, row in result.iterrows():
+
+        with st.expander(row["Video Name"]):
+
+            col1, col2 = st.columns([1,3])
+
+            with col1:
+                st.link_button("▶ Open Vimeo", row["Video URL"])
+
+            with col2:
+
+                if row["Embed URL"] != "":
+
+                    embed_url = get_embed_url(row["Embed URL"])
+
+                    if embed_url:
+                        st.iframe(
+                            embed_url,
+                            height=500,
+                            scrolling=False
+                        )
+
+    st.stop()
 
 
-# ----------------------
-# Filters
-# ----------------------
-batch = st.sidebar.selectbox(
-    "Batch",
-    sorted(result["Batch"].unique())
-)
+# ======================
+# ======================
+# TOP FILTERS
+# ======================
 
-subject = st.sidebar.selectbox(
-    "Subject",
-    sorted(
-        result[result["Batch"] == batch]["Subject"].unique()
-    )
-)
+st.markdown("---")
 
-faculty = st.sidebar.selectbox(
-    "Faculty",
-    sorted(
-        result[
-            (result["Batch"] == batch)
-            &
-            (result["Subject"] == subject)
-        ]["Faculty"].unique()
-    )
-)
+col1, col2, col3, col4 = st.columns(4)
 
-chapter = st.sidebar.selectbox(
-    "Chapter",
-    sorted(
-        result[
-            (result["Batch"] == batch)
-            &
-            (result["Subject"] == subject)
-            &
-            (result["Faculty"] == faculty)
-        ]["Chapter"].unique()
-    )
-)
+# ---------------- Batch ----------------
 
-
-videos = result[
-    (result["Batch"] == batch)
-    &
-    (result["Subject"] == subject)
-    &
-    (result["Faculty"] == faculty)
-    &
-    (result["Chapter"] == chapter)
-].reset_index(drop=True)
-
-
-st.subheader(chapter)
-
-video_names = videos["Video Name"].tolist()
-
-selected_video = st.selectbox(
-    "Select Lecture",
-    video_names
-)
-
-index = video_names.index(selected_video)
-
-row = videos.iloc[index]
-
-embed_url = get_embed_url(row["Embed URL"])
-
-# ----------------------
-# Navigation Buttons
-# ----------------------
-col1, col2, col3, col4 = st.columns([1,1,1,3])
+batch_values = ["Select Batch"] + sorted(df["Batch"].unique())
 
 with col1:
-    if index > 0:
-        if st.button("◀ Previous"):
-            st.session_state.selected = index - 1
+    batch = st.selectbox(
+        "Batch",
+        batch_values,
+        index=0
+    )
+
+# ---------------- Subject ----------------
+
+if batch == "Select Batch":
+    subject_values = ["Select Subject"]
+else:
+    subject_values = ["Select Subject"] + sorted(
+        df[df["Batch"] == batch]["Subject"].unique()
+    )
 
 with col2:
-    st.link_button(
-        "🔗 Vimeo",
-        row["Video URL"]
+    subject = st.selectbox(
+        "Subject",
+        subject_values,
+        index=0
+    )
+
+# ---------------- Faculty ----------------
+
+if subject == "Select Subject":
+    faculty_values = ["Select Faculty"]
+else:
+    faculty_values = ["Select Faculty"] + sorted(
+        df[
+            (df["Batch"] == batch)
+            &
+            (df["Subject"] == subject)
+        ]["Faculty"].unique()
     )
 
 with col3:
-    st.code(row["Video URL"])
+    faculty = st.selectbox(
+        "Faculty",
+        faculty_values,
+        index=0
+    )
 
-st.divider()
+# ---------------- Chapter ----------------
 
-st.markdown(
-    f"### 🎬 {row['Video Name']}"
+if faculty == "Select Faculty":
+    chapter_values = ["Select Chapter"]
+else:
+    chapter_values = ["Select Chapter"] + sorted(
+        df[
+            (df["Batch"] == batch)
+            &
+            (df["Subject"] == subject)
+            &
+            (df["Faculty"] == faculty)
+        ]["Chapter"].unique()
+    )
+
+with col4:
+    chapter = st.selectbox(
+        "Chapter",
+        chapter_values,
+        index=0
+    )
+
+# Wait until user selects everything
+
+if batch == "Select Batch":
+    st.stop()
+
+if subject == "Select Subject":
+    st.stop()
+
+if faculty == "Select Faculty":
+    st.stop()
+
+if chapter == "Select Chapter":
+    st.stop()
+# ======================
+# CHAPTER VIDEOS
+# ======================
+
+videos = df[
+    (df["Batch"] == batch)
+    &
+    (df["Subject"] == subject)
+    &
+    (df["Faculty"] == faculty)
+    &
+    (df["Chapter"] == chapter)
+]
+
+st.subheader(f"📚 {chapter}")
+
+search_inside = st.text_input(
+    "Search within this chapter"
 )
+
+if search_inside:
+    videos = videos[
+        videos["Video Name"].str.contains(
+            search_inside,
+            case=False,
+            na=False
+        )
+    ]
+
+st.write(f"Total Videos : {len(videos)}")
+
+# ======================
+# VIDEO LIST
+# ======================
+
+lecture = st.selectbox(
+    "Lecture",
+    videos["Video Name"].tolist(),
+    index=0
+)
+
+row = videos[videos["Video Name"] == lecture].iloc[0]
+
+st.markdown(f"## 🎬 {row['Video Name']}")
+
+embed_url = get_embed_url(row["Embed URL"])
 
 if embed_url:
     st.components.v1.html(
@@ -160,11 +236,9 @@ if embed_url:
             width="100%"
             height="700"
             frameborder="0"
-            allow="autoplay; fullscreen; picture-in-picture"
+            allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media"
             allowfullscreen>
         </iframe>
         """,
-        height=720
+        height=720,
     )
-else:
-    st.error("Embed URL not found")
