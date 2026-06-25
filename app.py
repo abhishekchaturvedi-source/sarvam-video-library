@@ -24,14 +24,12 @@ st.set_page_config(
 # --------------------------
 # Load Data
 # --------------------------
-@st.cache_data
+@st.cache_data(ttl=60)
 def load_data():
-    data = pd.read_excel(
+    return pd.read_excel(
         "VideoList.xlsx",
         dtype=str
-    )
-
-    data = data.fillna("")
+    ).fillna("")
 
     return data
 
