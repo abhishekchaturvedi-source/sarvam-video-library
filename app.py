@@ -32,8 +32,16 @@ def load_data():
 df = load_data()
 
 st.success("Reading file: VideoLists.xlsx")
+
 st.write("Total Rows:", len(df))
-st.write(df.head(5))
+
+st.write("Unique Faculty Names")
+
+st.write(sorted(df["Faculty"].unique()))
+
+st.write("First 10 Rows")
+
+st.dataframe(df[["Batch","Subject","Faculty","Chapter","Video Name"]].head(10))
 
 # ======================
 # GLOBAL SEARCH
@@ -45,7 +53,8 @@ st.write(df.head(5))
 st.markdown("### 🔍 Search")
 
 search_text = st.text_input(
-    "",
+    "Search",
+    label_visibility="collapsed",
     placeholder="Search Lecture / Chapter / Faculty..."
 )
 
