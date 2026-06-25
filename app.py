@@ -114,18 +114,10 @@ if search_text:
                     embed_url = get_embed_url(row["Embed URL"])
 
                    if embed_url:
-    components.html(
-        f"""
-        <iframe
-            src="{embed_url}"
-            width="100%"
-            height="500"
-            frameborder="0"
-            allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media"
-            allowfullscreen>
-        </iframe>
-        """,
-        height=520,
+    st.iframe(
+        embed_url,
+        height=500,
+        scrolling=False
     )
 
     st.stop()
