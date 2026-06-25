@@ -232,15 +232,59 @@ st.write(f"Total Videos : {len(videos)}")
 # VIDEO LIST
 # ======================
 
-lecture = st.selectbox(
+# -----------------------
+# Lecture Navigation
+# -----------------------
+
+lecture_list = videos["Video Name"].tolist()
+
+# Create session state
+if "current_index" not in st.session_state:
+    st.session_state.current_index = 0
+
+# Reset index when chapter changes
+chapter_key = f"{batch}_{subject}_{faculty}_{chapter}"
+
+if "last_chapter" not in st.session_state:
+    st.session_state.last_chapter = chapter_key
+
+if st.session_state.last_chapter != chapter_key:
+    st.session_state.current_index = 0
+    st.session_state.last_chapter = chapter_key
+
+# Lecture dropdown
+selected_lecture = st.selectbox(
     "Lecture",
-    videos["Video Name"].tolist(),
-    index=0
+    lecture_list,
+    index=st.session_state.current_index
 )
+
+st.session_state.current_index = lecture_list.index(selected_lecture)
+
+# Previous / Next buttons
+col1, col2, col3 = st.columns([1,4,1])
+
+with col1:
+    if st.button("⬅ Previous"):
+        if st.session_state.current_index > 0:
+            st.session_state.current_index -= 1
+            st.rerun()
+
+with col3:
+    if st.button("Next ➡"):
+        if st.session_state.current_index < len(lecture_list)-1:
+            st.session_state.current_index += 1
+            st.rerun()
+
+lecture = lecture_list[st.session_state.current_index]
 
 row = videos[videos["Video Name"] == lecture].iloc[0]
 
-st.markdown(f"## 🎬 {row['Video Name']}")
+st.markdown(
+    f"### 🎬 Lecture {st.session_state.current_index + 1} of {len(lecture_list)}"
+)
+
+st.markdown(f"## {row['Video Name']}")
 
 embed_url = get_embed_url(row["Embed URL"])
 
