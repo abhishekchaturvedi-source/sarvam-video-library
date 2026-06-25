@@ -26,27 +26,14 @@ st.set_page_config(
 # --------------------------
 @st.cache_data(ttl=60)
 def load_data():
-    return pd.read_excel(
-        "VideoLists.xlsx",
-        dtype=str
-    ).fillna("")
-
-    return data
+    df = pd.read_excel("VideoLists.xlsx", dtype=str).fillna("")
+    return df
 
 df = load_data()
-st.success("Reading : VideoLists.xlsx")
-st.write(df.head())
-col1, col2 = st.columns([1, 8])
 
-with col1:
-    st.image("assets/logo.png", width=290)
-
-with col2:
-    st.markdown("""
-    <h1 style='margin-bottom:0px;color:#0B5ED7;'>
-        Sarvam Video Library
-    </h1>
-    """, unsafe_allow_html=True)
+st.success("Reading file: VideoLists.xlsx")
+st.write("Total Rows:", len(df))
+st.write(df.head(5))
 
 # ======================
 # GLOBAL SEARCH
