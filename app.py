@@ -44,7 +44,7 @@ df = load_data()
 col_logo, col_title = st.columns([1, 6])
 
 with col_logo:
-    st.image("assets/logo.png", width=130)
+    st.image("assets/logo.png", width=430)
 
 with col_title:
     st.markdown(
