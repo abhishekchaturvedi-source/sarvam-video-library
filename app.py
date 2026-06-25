@@ -34,7 +34,8 @@ def load_data():
     return data
 
 df = load_data()
-
+st.success("Reading : VideoLists.xlsx")
+st.write(df.head())
 col1, col2 = st.columns([1, 8])
 
 with col1:
