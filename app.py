@@ -104,29 +104,30 @@ if search_text:
 
             col1, col2 = st.columns([1,3])
 
-            st.write("▶ Embedded Player")
+            with col1:
+                st.link_button("▶ Open Vimeo", row["Video URL"])
 
-      with col2:
+            with col2:
 
-    if row["Embed URL"] != "":
+                if row["Embed URL"] != "":
 
-        embed_url = get_embed_url(row["Embed URL"])
+                    embed_url = get_embed_url(row["Embed URL"])
 
-        if embed_url:
+                    if embed_url:
 
-            components.html(
-                f"""
-                <iframe
-                    src="{embed_url}"
-                    width="100%"
-                    height="500"
-                    frameborder="0"
-                    allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media"
-                    allowfullscreen>
-                </iframe>
-                """,
-                height=520,
-            )
+                        components.html(
+                            f"""
+                            <iframe
+                                src="{embed_url}"
+                                width="100%"
+                                height="500"
+                                frameborder="0"
+                                allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media"
+                                allowfullscreen>
+                            </iframe>
+                            """,
+                            height=520,
+                        )
 
     st.stop()
 
