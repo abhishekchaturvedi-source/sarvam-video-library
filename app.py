@@ -35,7 +35,26 @@ def load_data():
     ).fillna("")
     return df
 
-df = load_data()# ======================
+df = load_data()
+# ======================
+# ======================
+# HEADER
+# ======================
+
+col_logo, col_title = st.columns([1, 6])
+
+with col_logo:
+    st.image("assets/logo.png", width=130)
+
+with col_title:
+    st.markdown(
+        """
+        <h1 style='color:#1E66F5; margin-top:20px;'>
+        Sarvam Video Library
+        </h1>
+        """,
+        unsafe_allow_html=True,
+    )
 # GLOBAL SEARCH
 # ======================
 # ======================
