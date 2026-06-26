@@ -229,19 +229,27 @@ with col1:
 
 # ---------------- Subject ----------------
 
-if batch == "Select Batch":
-    subject_values = ["Select Subject"]
-else:
-    subject_values = ["Select Subject"] + sorted(
-        df[df["Batch"] == batch]["Subject"].unique()
-    )
+# ---------------- Subject ----------------
 
-with col2:
-    subject = st.selectbox(
-        "Subject",
-        subject_values,
-        index=0
-    )
+if st.session_state.role == "Admin":
+
+    if batch == "Select Batch":
+        subject_values = ["Select Subject"]
+    else:
+        subject_values = ["Select Subject"] + sorted(
+            df[df["Batch"] == batch]["Subject"].unique()
+        )
+
+    with col2:
+        subject = st.selectbox(
+            "Subject",
+            subject_values,
+            index=0
+        )
+
+else:
+
+    subject = st.session_state.subject
 
 # ---------------- Faculty ----------------
 
