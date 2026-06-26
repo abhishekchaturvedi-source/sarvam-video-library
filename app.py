@@ -37,6 +37,19 @@ def load_data():
 
 df = load_data()
 # ======================
+users = pd.read_excel("Users.xlsx", dtype=str).fillna("")
+
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+
+if "role" not in st.session_state:
+    st.session_state.role = ""
+
+if "subject" not in st.session_state:
+    st.session_state.subject = ""
+
+if "username" not in st.session_state:
+    st.session_state.username = ""
 # ======================
 # HEADER
 # ======================
@@ -72,6 +85,57 @@ with col2:
         """,
         unsafe_allow_html=True
     )
+# =================
+
+col1,col2 = st.columns([8,1])
+
+with col2:
+
+    if st.button("Logout"):
+
+        st.session_state.logged_in=False
+        st.session_state.role=""
+        st.session_state.subject=""
+        st.session_state.username=""
+
+        st.rerun()
+# =========================
+if not st.session_state.logged_in:
+
+    st.title("🎥 Sarvam Video Library")
+
+    st.subheader("Login")
+
+    username = st.text_input("Username")
+
+    password = st.text_input(
+        "Password",
+        type="password"
+    )
+
+    if st.button("Login"):
+
+        user = users[
+            (users["Username"] == username)
+            &
+            (users["Password"] == password)
+        ]
+
+        if len(user):
+
+            st.session_state.logged_in = True
+            st.session_state.username = username
+            st.session_state.role = user.iloc[0]["Role"]
+            st.session_state.subject = user.iloc[0]["Subject"]
+
+            st.rerun()
+
+        else:
+
+            st.error("Invalid Username or Password")
+
+    st.stop()
+
 # GLOBAL SEARCH
 # ======================
 # ======================
@@ -139,10 +203,21 @@ if search_text:
 
 st.markdown("---")
 
-col1, col2, col3, col4 = st.columns(4)
+if st.session_state.role=="Admin":
+
+    col1,col2,col3,col4=st.columns(4)
+
+else:
+
+    col1,col3,col4=st.columns(3)
 
 # ---------------- Batch ----------------
+if st.session_state.role != "Admin":
 
+    df = df[
+        df["Subject"] == st.session_state.subject
+    ]
+    
 batch_values = ["Select Batch"] + sorted(df["Batch"].unique())
 
 with col1:
